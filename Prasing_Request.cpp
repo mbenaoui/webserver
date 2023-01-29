@@ -78,8 +78,8 @@ void Prasing_Request::prasing_headr(std ::string headrs)
         }
         if (methode == "POST" && (mymap["Content-Length"].empty() || atoi(mymap["Content-Length"].c_str()) < 0))
         {
-            std ::cout << "error on Content-Length !!!" << std::endl;
-            status = 400;
+            std ::cout << "411 Length Required" << std::endl;
+            status = 411;
             return;
         }
         if (mymap["HOST"].empty())
@@ -94,13 +94,59 @@ void Prasing_Request::prasing_headr(std ::string headrs)
             status = 400;
             return;
         }
+        if (mymap["Transfer-Encoding"] != "chunked")
+        {
+            std ::cout << "error on Transfer-Encoding !!!" << std::endl;
+            this->status = 400;
+        }
+        if (mymap["Transfer-Encoding"] == "chunked")
+        {
+            this->status = 200;
+        }
     }
+}
+Prasing_Request::Prasing_Request(std::string hedr)
+{
+    if (!hedr[0])
+        return;
+    this->status = 200;
+    std ::string first;
+    std ::string hdr;
+    int i = 0;
+    while (i < hedr.length())
+    {
+        if (hedr.at(i) == '\r' || hedr.at(i) == '\n')
+            break;
+        i++;
+    }
+    first = hedr.substr(0, i);
+    hdr = hedr.substr(i, hedr.find("\r\n\r\n"));
+    if(!check_first_line(first))
+        return ;
+    prasing_headr(hdr);
+    if(this->status != 200)
+        return ;
+}
+
+std ::string Prasing_Request ::get_methode()
+{
+    return this->methode;
+}
+std ::string Prasing_Request ::get_url()
+{
+    return this->url;
+}
+std ::string Prasing_Request ::get_budy_url()
+{
+    return this->budy_url;
+}
+int Prasing_Request ::get_status()
+{
+    return this->status;
 }
 int main()
 {
-    Prasing_Request rp;
-    std::string cheker = "dfhd: cvf\r\njvhd: fhvgh\r\nvfhshj: dcfdv\r\nhkvfdhk: vhkghfhh";
-    rp.prasing_headr(cheker);
+    Prasing_Request rp("dfhd: cvf\r\njvhd: fhvgh\r\nvfhshj: dcfdv\r\nhkvfdhk: vhkghfhh\r\n\r\n");
     // int status = rp.check_first_line(cheker);
     //    std ::cout << "abc\r 45" << std::endl;
 }

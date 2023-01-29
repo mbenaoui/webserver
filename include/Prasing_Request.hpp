@@ -27,5 +27,10 @@ class  Prasing_Request {
      public :
      int check_first_line(std::string first_line);
      void prasing_headr(std ::string headrs);
+     Prasing_Request(std :: string hedr);
+     std :: string get_methode();
+     std :: string get_url();
+     std :: string get_budy_url();
+     int get_status();
 };
 #endif
