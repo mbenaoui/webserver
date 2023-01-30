@@ -62,10 +62,13 @@ void Prasing_Request::prasing_headr(std ::string headrs)
 {
 
     std ::vector<std ::string> res = split(headrs, "\r\n");
-    for (int i = 0; i < res.size(); i++)
+    for (int i = 1; i < res.size(); i++)
     {
+        if (res[i] == "\r\n" || res[i] == "\0")
+            break;
         std ::string key = res[i].substr(0, res[i].find(":"));
-        std ::string value = res[i].substr(res[i].find(" "));
+        std ::string value = res[i].substr(res[i].find(" ") + 1);
+
         mymap.insert(std ::pair<std ::string, std::string>(key, value));
     }
     if (status == 200)
@@ -82,7 +85,7 @@ void Prasing_Request::prasing_headr(std ::string headrs)
             status = 411;
             return;
         }
-        if (mymap["HOST"].empty())
+        if (mymap["Host"].empty())
         {
             std ::cout << "error om HOST !!" << std ::endl;
             status = 400;
@@ -119,13 +122,15 @@ Prasing_Request::Prasing_Request(std::string hedr)
             break;
         i++;
     }
+
     first = hedr.substr(0, i);
-    hdr = hedr.substr(i, hedr.find("\r\n\r\n"));
-    if(!check_first_line(first))
-        return ;
+    hdr = hedr.substr(0, hedr.find("\r\n\r\n"));
+    if (!check_first_line(first))
+        return;
     prasing_headr(hdr);
-    if(this->status != 200)
-        return ;
+
+    if (this->status != 200)
+        return;
 }
 
 std ::string Prasing_Request ::get_methode()
@@ -146,7 +151,7 @@ int Prasing_Request ::get_status()
 }
 int main()
 {
-    Prasing_Request rp("dfhd: cvf\r\njvhd: fhvgh\r\nvfhshj: dcfdv\r\nhkvfdhk: vhkghfhh\r\n\r\n");
+    Prasing_Request rp("POST /cgi-bin/process.cgi HTTP/1.1\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\nHost: www.tutorialspoint.com\r\nContent-Type: text/xml; charset=utf-8\r\nContent-Length: length\r\nAccept-Language: en-us\r\nAccept-Encoding: gzip, deflate\r\nTransfer-Encoding: chunked\r\n\r\n gbbgfn");
     // int status = rp.check_first_line(cheker);
     //    std ::cout << "abc\r 45" << std::endl;
 }
