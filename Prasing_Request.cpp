@@ -110,7 +110,7 @@ void Prasing_Request::prasing_headr(std ::string headrs)
 }
 Prasing_Request::Prasing_Request(std::string hedr)
 {
-    if (!hedr[0])
+    if (!hedr.at(0))
         return;
     this->status = 200;
     std ::string first;
